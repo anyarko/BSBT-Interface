@@ -9,7 +9,6 @@ class Cluster(db.Model):
     name = db.Column(db.String(255), nullable=False)
     #cluster = db.Column(db.Integer, nullable=False)
 
-
 class Region(db.Model):
     __tablename__ = 'regions'
 
@@ -20,19 +19,33 @@ class Region(db.Model):
 
     cluster = db.relationship('Cluster', backref=db.backref('regions', lazy=True))
 
+class NeighbouringRegion(db.Model):
+    __tablename__ = 'neighbours'
+
+    id = db.Column(db.Integer, primary_key=True)
+    cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
+    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
+
+    cluster = db.relationship('Cluster', backref=db.backref('clusters', lazy=True))
+    region = db.relationship('Region', backref=db.backref('regions', lazy=True))
 
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(20), nullable=False)
-    occupation = db.Column(db.String(200), nullable=False)
+    ne = db.Column(db.Boolean(), default=False)
+    nw = db.Column(db.Boolean(), default=False)
+    yh = db.Column(db.Boolean(), default=False)
+    em = db.Column(db.Boolean(), default=False)
+    wm = db.Column(db.Boolean(), default=False)
+    east = db.Column(db.Boolean(), default=False)
+    l = db.Column(db.Boolean(), default=False)
+    se = db.Column(db.Boolean(), default=False)
+    sw = db.Column(db.Boolean(), default=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     def __repr__(self):
-        return '<User %d %r>' % (self.id, self.name)
+        return '<User %d>' % (self.id)
 
 
 class Ranking(db.Model):
@@ -41,17 +54,17 @@ class Ranking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    poorest = db.Column(
+    lesser = db.Column(
         db.Integer, db.ForeignKey('regions.id'), nullable=False)
-    richest = db.Column(
+    greater = db.Column(
         db.Integer, db.ForeignKey('regions.id'), nullable=False)
     rejudged = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', backref=db.backref('rankings', lazy=True))
 
     def __repr__(self):
-        return '<Ranking {} {} Poorest {} Richest {}>'.format(
-            self.date, self.user_id, self.poorest, self.richest)
+        return '<Ranking {} {} lesser {} greater {}>'.format(
+            self.date, self.user_id, self.lesser, self.greater)
 
 
 class SkippedRanking(db.Model):
@@ -80,16 +93,4 @@ class UnknowRegion(db.Model):
     region = db.relationship(
         'Region', backref=db.backref('unknown_by_users', lazy=True))
 
-
-class KnownRegion(db.Model):
-    __tablename__ = 'user_known_regions'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
-
-    user = db.relationship(
-        'User', backref=db.backref('known_regions', lazy=True))
-    bcluster = db.relationship(
-        'Region', backref=db.backref('known_by_users', lazy=True))
+  

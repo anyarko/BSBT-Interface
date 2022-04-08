@@ -1,26 +1,38 @@
 from flask import (Blueprint, redirect, render_template, request, session,
                    url_for)
 from website.extensions import db
-from website.models import User, Ranking, KnownRegion, UnknowRegion, Cluster, Region, SkippedRanking
+from website.models import (User, Ranking, UnknowRegion, Cluster, Region, 
+                        SkippedRanking, NeighbouringRegion) 
+
 import random
+import numpy as np
+import uuid
 
 blueprint = Blueprint('views', __name__)
+
+@blueprint.route('/')
+def intro():
+    session.clear()
+    return render_template('ethics_approval.html')
+
+@blueprint.route('/introduction')
+def introduction():
+    return render_template('introduction.html')
 
 
 @blueprint.route('/rank')
 @blueprint.route('/rank/<rid1>/<rid2>')
 def rank(rid1=None, rid2=None):
 
-    if 'user_region_bucket' not in session:
-        kw = KnownRegion.query.filter_by(user_id=session['user_id']).all()
+    region_id = 0
+    cluster_id = 1
 
-        session['user_region_bucket'] = [x.region_id for x in kw]
+    first_region = random.choice(session['user_region_bucket'])
 
-    r1_id = random.choice(session['user_region_bucket'])
-
-    sublist = session['user_region_bucket'].copy()
-    sublist.remove(r1_id)
-    r2_id = random.choice(sublist)
+    r1_id = first_region[region_id]
+    sublist = [region for region in session['user_region_bucket'] if region[cluster_id] == first_region[cluster_id]] 
+    sublist.remove(first_region)
+    r2_id = random.choice(sublist)[region_id]
 
     r1 = Region.query.filter_by(id=r1_id).first()
     r2 = Region.query.filter_by(id=r2_id).first()
@@ -28,31 +40,38 @@ def rank(rid1=None, rid2=None):
     return render_template('ranking_interface.html', r1=r1, r2=r2)
 
 
-@blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/register', methods=['GET', 'POST'])
 def register_user():
     session.clear()
-    if request.method == 'POST':
-        name = request.form['name'].replace("'", "")
-        age = request.form['age']
-        gender = request.form['gender']
-        occ = request.form['occupation']
+    if request.method == 'POST':     
 
-        user = User(name=name, age=age, gender=gender, occupation=occ)
+        session['known'] = list(request.form)
+        uk_clusters = {'NE': 1, 'NW': 2, 'Y&H': 3, 'EM': 4, 'WM': 5, 'East': 6, 'L': 7, 'SE': 8, 'SW': 9}
+        
+        ne, nw, yh, em, wm, east, l, se, sw = [True if cluster in session['known'] else False for cluster in uk_clusters]
+
+        user = User(ne=ne, nw=nw, yh=yh, em=em, wm=wm, east=east, l=l, se=se, sw=sw)
         db.session.add(user)
         db.session.commit()
-
         session['user_id'] = user.id
+        
+        session['user_region_bucket'] = []
+        for cluster_name in session['known']:
+            relevant_regions = Region.query.filter_by(cluster_id=uk_clusters[cluster_name]).all()            
+            session['user_region_bucket'].extend([(region.id, region.cluster_id) for region in relevant_regions])
 
-        return redirect(url_for('.known_clusters_selection'))
+            neighbouring_regions = NeighbouringRegion.query.filter_by(cluster_id=uk_clusters[cluster_name]).all()
+            session['user_region_bucket'].extend([(n_region.region_id, n_region.cluster_id) for n_region in neighbouring_regions])
 
-    return render_template('register.html')
+        return redirect(url_for('.rank'))
+
+    return render_template('entire_map.html')
 
 
 @blueprint.route('/store')
-@blueprint.route('/store/<poorest>/<richest>')
-def store_ranking(poorest=None, richest=None):
-    r = Ranking(user_id=session['user_id'], poorest=poorest, richest=richest)
+@blueprint.route('/store/<lesser>/<greater>')
+def store_ranking(lesser=None, greater=None):
+    r = Ranking(user_id=session['user_id'], lesser=lesser, greater=greater)
 
     db.session.add(r)
     db.session.commit()
@@ -80,19 +99,18 @@ def previous_ranking():
     db.session.add(r)
     db.session.commit()
 
-    r1 = Region.query.filter_by(id=r.poorest).first()
-    r2 = Region.query.filter_by(id=r.richest).first()
+    r1 = Region.query.filter_by(id=r.lesser).first()
+    r2 = Region.query.filter_by(id=r.greater).first()
 
     return render_template('ranking_interface.html', r1=r1, r2=r2)
 
 
-@blueprint.route('/unknown/<swid>')
-def store_unknown_region(swid):
+@blueprint.route('/unknown/<swid>/<cwid>')
+def store_unknown_region(swid, cwid):
     u = UnknowRegion(user_id=session['user_id'], region_id=swid)
 
     ks = session['user_region_bucket']
-    ks.remove(int(swid))
-    session['user_region_bucket'] = ks
+    session['user_region_bucket'] = [region for region in ks if region[0]!=int(swid)]
 
     db.session.add(u)
     db.session.commit()
@@ -100,54 +118,9 @@ def store_unknown_region(swid):
     return redirect(url_for('.rank'))
 
 
-@blueprint.route('/known/<rid>')
-def store_known_region(rid):
-    r = KnownRegion(user_id=session['user_id'], region_id=rid)
-
-    db.session.add(r)
-    db.session.commit()
-
-    return redirect(url_for('.known_regions_selection'))
-
-
 @blueprint.route('/logout')
 def logout():
     print(session.keys())
     session.clear()
     print(session.keys())
-    return redirect(url_for('.register_user'))
-
-
-@blueprint.route('/selection/clusters')
-def known_clusters_selection():
-    if 'clusters' not in session:
-        session['clusters'] = [
-            x[0] for x in db.session.query(Cluster.id).distinct().all()
-        ]
-
-    if len(session['clusters']) == 0:
-        session.pop('clusters', None)
-        return redirect(url_for('.rank'))
-
-    id = session['clusters'].pop()
-    session['clusters'] = session['clusters']
-    return render_template('cluster.html', id=id)
-
-
-@blueprint.route('/selection/regions')
-@blueprint.route('/selection/regions/<parent_cluster_id>')
-def known_regions_selection(parent_cluster_id=None):
-    if 'regions' not in session:
-        regions = Region.query.filter_by(cluster_id=parent_cluster_id).all()
-        session['regions'] = [x.id for x in regions]
-
-    if len(session['regions']) == 0:
-        session.pop('regions', None)
-        return redirect(url_for('.known_clusters_selection'))
-
-    id = session['regions'].pop()
-    session['regions'] = session['regions']
-
-    r = Region.query.filter_by(id=id).first()
-
-    return render_template('region.html', region=r)
+    return render_template('final.html')

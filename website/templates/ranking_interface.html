@@ -12,7 +12,17 @@
     width: 100%;
 }
 
-.richest {
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  margin: 0 10px;
+}
+
+.greater {
   border-style: solid;
   border-width: 10px;
   border-color: green;
@@ -28,35 +38,35 @@
     <div class="col text-center">
       <h4>
         {{ r1.cluster.name }} - <b>{{ r1.name }}</b>
-        <a href="{{ url_for('.store_unknown_region', swid=r1.id) }}" class="btn btn-outline-warning">I don't know</a>
+        <a href="{{ url_for('.store_unknown_region', swid=r1.id, cwid=r1.cluster_id) }}" class="btn btn-outline-warning">I don't know</a>
       </h4>
     </div>
     <div class="col text-center">
       <h4>
         {{ r2.cluster.name }} - <b>{{ r2.name }}</b>
-        <a href="{{ url_for('.store_unknown_region', swid=r2.id) }}" class="btn btn-outline-warning">I don't know</a>
+        <a href="{{ url_for('.store_unknown_region', swid=r2.id, cwid=r2.cluster_id) }}" class="btn btn-outline-warning">I don't know</a>
       </h4>
     </div>
   </div>
 
-  <div class="row pl-2 pr-2">
-    <div class="col p-2">
+  <div class="container">
+    <div class="card">
       <img id="left-image" data-swid={{ r1.id }} src= {{ url_for('static', filename = 'maps/region_' + r1.id|string + '.png') }} class="img-responsive">
     </div>
-    <div class="col p-2">
+    <div class="card">
       <img id="right-image" data-swid={{ r2.id }} src= {{ url_for('static', filename = 'maps/region_' + r2.id|string + '.png') }} class="img-responsive">
     </div>
   </div>
-
-  <div class="row pl-2 pr-2">
-    <div class="col-sm-4 p-2 text-left">
-      <a href="{{ url_for('.previous_ranking') }}" style="width:200px;" class="btn btn-outline-danger btn-lg">Previous</a>
+  <br>
+  <div class="container">
+    <div class="card text-left">
+      <a href="{{ url_for('.previous_ranking') }}" class="btn btn-outline-danger btn-lg">Previous</a>
     </div>
-    <div class="col-sm-4 p-2 text-center">
-      <button id="confirm-button" type="button" class="btn btn-primary disabled btn-lg" style="width:200px;" disabled>Confirm</button>
+    <div class="card text-center">
+      <button id="confirm-button" type="button" class="btn btn-primary disabled btn-lg" disabled>Confirm</button>
     </div>
-    <div class="col-sm-4 p-2 text-right">
-      <a href="{{ url_for('.skip_ranking', r1=r1.id, r2=r2.id) }}" class="btn btn-outline-danger btn-lg" style="width:200px;">Skip</a>
+    <div class="card text-right">
+      <a href="{{ url_for('.skip_ranking', r1=r1.id, r2=r2.id) }}" class="btn btn-outline-danger btn-lg" >Skip</a>
     </div>
   </div>
 
@@ -70,11 +80,11 @@
 var clicked_id = null;
 
 function rank_selected(subward_img) {
-  $("img").removeClass('richest');
+  $("img").removeClass('greater');
   $(".centered").remove();
 
-  subward_img.addClass('richest');
-  subward_img.after('<div class="centered"><h1 style="font-size:60px; color:green; font-weight: bold;">BETTER</h1></div>')
+  subward_img.addClass('greater');
+  subward_img.after('<div class="centered"><h1 style="font-size:60px; color:green; font-weight: bold;">HIGHER</h1></div>')
 
   clicked_id = subward_img.data('swid')
   $("#confirm-button").prop('disabled', false);
@@ -85,19 +95,19 @@ function rank_selected(subward_img) {
 function confirm_pressed() {
   $("img").each(function() {
     if ($(this).data('swid') != clicked_id) {
-      poorest = $(this).data('swid')
+      lesser = $(this).data('swid')
     }
   });
-  window.location.href = "{{ url_for('.store_ranking') }}" + "/" + poorest + "/" + clicked_id
+  window.location.href = "{{ url_for('.store_ranking') }}" + "/" + lesser + "/" + clicked_id
 }
 
 
 
 $(document).keypress(function(e) {
 	console.log(e.which);
-	  if(e.which == 113) {
+	  if(e.which == 49) {
 		  rank_selected($("#left-image"));
-	} else if(e.which == 112) {
+	} else if(e.which == 50) {
 		  rank_selected($("#right-image"));
 	} else if(e.which == 127 || e.which == 9) {
                   console.log('here')

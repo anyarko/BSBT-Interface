@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %} - Which areas do you know?{% endblock %}
+
+{% block content %}
+<div class="container-narrow text-center p-4">
+      <h4>Please select the areas you know.</h4>
+      <img id="left-image" src= {{ url_for('static', filename = 'maps/entire_map.png') }} class="img-responsive pt-2" style="width:600px; height:600px;">  
+      <form method = "POST">
+        <div class="form-group row" id="user-form" style="width:240px; height:240px; margin:0 auto;">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="NE" id="inlinecheckbox1" value="North East">
+            <label class="form-check-label">North East</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="NW" id="inlinecheckbox2" value="North West">
+            <label class="form-check-label">North West</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="Y&H" id="inlinecheckbox3" value="Yorkshire and The Humber">
+            <label class="form-check-label">Yorkshire and The Humber</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="EM" id="inlinecheckbox4" value="East Midlands">
+            <label class="form-check-label">East Midlands</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="WM" id="inlinecheckbox5" value="West Midlands">
+            <label class="form-check-label">West Midlands</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="East" id="inlinecheckbox6" value="East of England">
+            <label class="form-check-label">East of England</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="L" id="inlinecheckbox7" value="London">
+            <label class="form-check-label">London</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="SE" id="inlinecheckbox8" value="South East">
+            <label class="form-check-label">South East</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="SW" id="inlinecheckbox9" value="South West">
+            <label class="form-check-label">South West</label>
+          </div>
+        </div>
+        <div class="col-xl-12 p-4 text-center">
+          <form class="card-footer text-muted mx-auto bg-white border-top-0" method="POST">
+            <button type="submit"class="btn btn-primary text-center">Submit</button>
+          </form>
+        </div>  
+      </form>
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

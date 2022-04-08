@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="card m-5" xmlns="http://www.w3.org/1999/html">
+    <div class="card-body m-3">
+        <h1 class="card-title text-center">Comparative Judgement Survey</h1>
+        <br>
+        <h2>The gendered dynamics of sex trafficking in England: prevalence mapping</h2>
+
+        <p>
+            This aim of this study is to rank the regions in England by rate of sex trafficking.
+            In this study you will be shown pairs of regions and
+            asked to choose <b>which region has the higher rate of sex trafficking</b>. Your participation
+            should take around 10 minutes.
+        </p>
+        <br>
+        <div>
+            <h3 class="mb-3"> Instructions </h3>
+            <ol class="">
+                <li class="mb-3">Please tick the boxes of the areas in England(9) for which you are familar with the prevalence of sex trafficking in.</li>
+
+                <li class="mb-3">You will then be shown pairs of regions. Please click the picture of the region which has the higher rate of sex trafficking. Once you are happy with your choice, please click confirm.</li>
+
+                <li class="mb-3">The <b>1, 2, enter and spacebar</b> buttons on your keyboard allow you to do this easily without clicking.</li>
+
+                <li class="mb-3">If your are unfamiliar with one of the regions, please click ‘I don’t know’ above the picture of the region. You will not be asked about this region again.</li>
+
+                <li class="mb-3">If the regions have the same level, please click skip on the right of the screen.</li>
+
+                <li class="mb-3">We ask you do 30 comparisons. Once you have finished, click finish in the top right of the screen.</li>
+            </ol>
+        </div>
+
+
+        <p class="mt-5"> Please email any questions to Dr Rowland Seymour (rowland.seymour@nottingham.ac.uk)</p>
+
+    </div>
+    <form class="card-footer text-muted mx-auto bg-white border-top-0" action="{{ url_for('views.register_user') }}" method="GET">
+        <button type="submit" style="width: 200px; height: 50px" class="btn btn-sm btn-outline-secondary bg-success text-white">Start Survey</button>
+    </form>
+</div>
+
+{% endblock %}
