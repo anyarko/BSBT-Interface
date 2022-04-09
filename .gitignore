@@ -1,0 +1,14 @@
+__pycache__/
+website/__pycache__/
+data/
+englishAOI.dbf
+englishAOI.prj
+englishAOI.shp
+englishAOI.shx
+clustering.py
+NUTS_Level_1/
+instance/
+.pylintrc
+.gitignore.txt
+comparative_judgements.db
+
