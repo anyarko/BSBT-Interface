@@ -42,6 +42,8 @@ class User(db.Model):
     l = db.Column(db.Boolean(), default=False)
     se = db.Column(db.Boolean(), default=False)
     sw = db.Column(db.Boolean(), default=False)
+    work_field = db.Column(db.String(2), default=False)
+    organisation = db.Column(db.String(2), default=False)
     created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     def __repr__(self):

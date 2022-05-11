@@ -8,6 +8,16 @@ import random
 import numpy as np
 import uuid
 
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, SelectField
+from wtforms.validators import DataRequired
+
+
+class UserForm(FlaskForm):
+ organisation = SelectField('Which type of organisation do you work for?', choices=[('g', 'governmental'), ('ng','non-governmental')], validators=[DataRequired()])
+ work_field = SelectField('What is primarily your client base?', choices=[('sw','sex workers'),('ms', 'modern slavery/human trafficking victims'), \
+     ('s', 'survivors'), ('m', 'multiple'), ('o','other')], validators=[DataRequired()])
+
 blueprint = Blueprint('views', __name__)
 
 @blueprint.route('/')
@@ -46,11 +56,18 @@ def register_user():
     if request.method == 'POST':     
 
         session['known'] = list(request.form)
+        session['known'].remove('work_field')
+        session['known'].remove('organisation')
+
+
         uk_clusters = {'NE': 1, 'NW': 2, 'Y&H': 3, 'EM': 4, 'WM': 5, 'East': 6, 'L': 7, 'SE': 8, 'SW': 9}
         
         ne, nw, yh, em, wm, east, l, se, sw = [True if cluster in session['known'] else False for cluster in uk_clusters]
+        
+        organisation = request.form['organisation']
+        work_field = request.form['work_field']
 
-        user = User(ne=ne, nw=nw, yh=yh, em=em, wm=wm, east=east, l=l, se=se, sw=sw)
+        user = User(ne=ne, nw=nw, yh=yh, em=em, wm=wm, east=east, l=l, se=se, sw=sw, organisation=organisation, work_field=work_field)
         db.session.add(user)
         db.session.commit()
         session['user_id'] = user.id
@@ -65,7 +82,8 @@ def register_user():
 
         return redirect(url_for('.rank'))
 
-    return render_template('entire_map.html')
+    user_form = UserForm()
+    return render_template('entire_map.html', form=user_form)
 
 
 @blueprint.route('/store')
