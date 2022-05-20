@@ -69,8 +69,8 @@ class Ranking(db.Model):
             self.date, self.user_id, self.lesser, self.greater)
 
 
-class SkippedRanking(db.Model):
-    __tablename__ = 'skipped_rankings'
+class SameRanking(db.Model):
+    __tablename__ = 'same_rankings'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -78,7 +78,7 @@ class SkippedRanking(db.Model):
     r1 = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
     r2 = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
 
-    user = db.relationship('User', backref=db.backref('skipped_rankings', lazy=True))
+    user = db.relationship('User', backref=db.backref('same_rankings', lazy=True))
 
 
 class UnknowRegion(db.Model):

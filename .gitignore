@@ -9,6 +9,5 @@ clustering.py
 NUTS_Level_1/
 instance/
 .pylintrc
-.gitignore.txt
 comparative_judgements.db
 

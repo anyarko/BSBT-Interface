@@ -2,7 +2,7 @@ from flask import (Blueprint, redirect, render_template, request, session,
                    url_for)
 from website.extensions import db
 from website.models import (User, Ranking, UnknowRegion, Cluster, Region, 
-                        SkippedRanking, NeighbouringRegion) 
+                        SameRanking, NeighbouringRegion) 
 
 import random
 import numpy as np
@@ -14,9 +14,9 @@ from wtforms.validators import DataRequired
 
 
 class UserForm(FlaskForm):
- organisation = SelectField('Which type of organisation do you work for?', choices=[('g', 'governmental'), ('ng','non-governmental')], validators=[DataRequired()])
- work_field = SelectField('What is primarily your client base?', choices=[('sw','sex workers'),('ms', 'modern slavery/human trafficking victims'), \
-     ('s', 'survivors'), ('m', 'multiple'), ('o','other')], validators=[DataRequired()])
+ organisation = SelectField('Which type of organisation do you work for?', choices=[('g', 'Governmental'), ('ng','Non-governmental')], validators=[DataRequired()])
+ work_field = SelectField('What is primarily your client base?', choices=[('sw','Sex workers'),('ms', 'Modern slavery/Human trafficking victims'), \
+      ('o','Other'), ('m', 'Multiple')], validators=[DataRequired()])
 
 blueprint = Blueprint('views', __name__)
 
@@ -97,9 +97,9 @@ def store_ranking(lesser=None, greater=None):
     return redirect(url_for('.rank'))
 
 
-@blueprint.route('/skip/<r1>/<r2>')
-def skip_ranking(r1=None, r2=None):
-    s = SkippedRanking(user_id=session['user_id'], r1=r1, r2=r2)
+@blueprint.route('/same/<r1>/<r2>')
+def same_ranking(r1=None, r2=None):
+    s = SameRanking(user_id=session['user_id'], r1=r1, r2=r2)
 
     db.session.add(s)
     db.session.commit()
