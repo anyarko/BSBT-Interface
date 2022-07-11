@@ -1,0 +1,9 @@
+version: '3'
+services:
+    bsbt-tf:
+        container_name: bsbt-tf-one
+        build: .
+        ports:
+            - "8089:5000"
+        volumes:
+            - .:/website

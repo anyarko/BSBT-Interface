@@ -14,7 +14,7 @@ def create_app(test_config=None):
     #    config_object = DevConfig
     #else:
     #    config_object = ProdConfig
-    config_object = DevConfig
+    config_object = ProdConfig
 
     app.config.from_object(config_object)
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 10

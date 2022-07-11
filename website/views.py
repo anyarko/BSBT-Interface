@@ -5,7 +5,6 @@ from website.models import (User, Ranking, UnknowRegion, Cluster, Region,
                         SameRanking, NeighbouringRegion) 
 
 import random
-import numpy as np
 import uuid
 
 from flask_wtf import FlaskForm

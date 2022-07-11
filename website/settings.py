@@ -8,5 +8,7 @@ class DevConfig(object):
 
 
 class ProdConfig(object):
+    SECRET_KEY = 'toady57isproduction62'
     CONFIG_TYPE = 'Production'
-    DB = None
+    SQLALCHEMY_DATABASE_URI='sqlite:///../comparative_judgements.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
